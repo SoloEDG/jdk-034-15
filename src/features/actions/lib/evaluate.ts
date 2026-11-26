@@ -21,4 +21,5 @@ export const failures = {
   reach: '超出可触及范围',
   support: '身体支撑不足，发生失衡',
   energy: '剩余体力不足',
+  occupied: '落点尚未完全释放，被提前抢占',
 };

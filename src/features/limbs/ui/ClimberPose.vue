@@ -5,7 +5,7 @@ import { holdAt } from '../../wall';
 import { body, limbs, limbTags } from '../lib/support';
 import { isHand } from '../lib/reach';
 
-const props = defineProps<{ route: Route; contacts: Contacts; selected: Limb; attempted?: string }>();
+const props = defineProps<{ route: Route; contacts: Contacts; selected: Limb; attempted?: string; attempted2?: string }>();
 const center = computed(() => body(props.route, props.contacts));
 const joints = computed(() => limbs.map(limb => {
   const { x, y } = center.value;
@@ -16,12 +16,13 @@ const joints = computed(() => limbs.map(limb => {
   const bend: Point = { x: (joint.x + end.x) / 2 + side * 15, y: (joint.y + end.y) / 2 + (hand ? 9 : -9) };
   return { limb, joint, bend, end, path: 'M' + joint.x + ' ' + joint.y + ' L' + bend.x + ' ' + bend.y + ' ' + end.x + ' ' + end.y };
 }));
-const mark = computed(() => props.attempted ? holdAt(props.route, props.attempted) : null);
+const marks = computed(() => [props.attempted, props.attempted2]
+  .filter((id): id is string => Boolean(id)).map(id => holdAt(props.route, id)));
 </script>
 
 <template>
   <g class="pose" aria-hidden="true">
-    <path v-if="mark" :d="'M' + center.x + ' ' + center.y + ' L' + mark.x + ' ' + mark.y" class="attempt-line"/>
+    <path v-for="mark in marks" :key="mark.id" :d="'M' + center.x + ' ' + center.y + ' L' + mark.x + ' ' + mark.y" class="attempt-line"/>
     <g v-for="line in joints" :key="line.limb" :class="{ 'active-limb': line.limb === selected }">
       <path :d="line.path" class="limb-shadow"/>
       <path :d="line.path" class="limb-line"/>

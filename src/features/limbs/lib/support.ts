@@ -13,7 +13,12 @@ export function body(route: Route, contacts: Contacts): Point {
 }
 
 export function balance(route: Route, contacts: Contacts, released?: Limb): Balance {
-  const anchors = limbs.filter(limb => limb !== released).map(limb => holdAt(route, contacts[limb]));
+  return balanceWith(route, contacts, released ? [released] : []);
+}
+
+export function balanceWith(route: Route, contacts: Contacts, released: Limb[]): Balance {
+  const anchors = limbs.filter(limb => !released.includes(limb)).map(limb => holdAt(route, contacts[limb]));
+  if (!anchors.length) return { margin: -99, span: 0 };
   const center = body(route, contacts);
   const span = Math.max(...anchors.map(anchor => distance(center, anchor)));
   const leverage = Math.abs(center.x - centroid(anchors).x) / 34;
